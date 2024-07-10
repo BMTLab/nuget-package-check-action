@@ -52,7 +52,7 @@ jobs:
           LATEST_TAG=${LATEST_TAG#v}
 
           # Compare versions
-          if [[ $(echo -e "$LATEST_TAG\n$VERSION" | sort -V | head -n1) == "$LATEST_TAG" ]]; then
+          if [[ $(echo -e "$LATEST_TAG\n$VERSION" | sort -Vr | head -n1) != "$VERSION" ]]; then
             echo "The provided version $VERSION is not greater than the latest tag $LATEST_TAG" >&2
             exit 102
           fi
