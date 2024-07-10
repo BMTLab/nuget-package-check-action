@@ -29,6 +29,9 @@ jobs:
         with:
           name: ${{ env.BOT_NAME }}
           email: ${{ env.BOT_EMAIL }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
 
       - name: Validate version
         id: validate_version
