@@ -29,31 +29,34 @@ jobs:
         with:
           name: ${{ env.BOT_NAME }}
           email: ${{ env.BOT_EMAIL }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
 
       - name: Validate version
         id: validate_version
         run: |
           VERSION=${{ github.event.inputs.version }}
-          
+
           # Check if the version matches the pattern X.Y.Z
           if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Invalid version format. The version must match the pattern X.Y.Z" >&2
             exit 101
           fi
-          
+
           # Fetch all tags
           git fetch --tags
 
           # Get the latest tag
           LATEST_TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)" || echo '0.0.0')
           LATEST_TAG=${LATEST_TAG#v}
-          
+
           # Compare versions
-          if [[ $(echo -e "$LATEST_TAG\n$VERSION" | sort -V | head -n1) == "$LATEST_TAG" ]]; then
+          if [[ $(echo -e "$LATEST_TAG\n$VERSION" | sort -Vr | head -n1) != "$VERSION" ]]; then
             echo "The provided version $VERSION is not greater than the latest tag $LATEST_TAG" >&2
             exit 102
           fi
-          
+
           echo "Version $VERSION is valid and greater than the latest tag $LATEST_TAG"
 
       - name: Checkout main branch
@@ -68,7 +71,7 @@ jobs:
 
       - name: Push changes to dev
         run: |
-          git push origin dev --force
+          git push origin dev --force-with-lease
 
       - name: Checkout main branch again
         uses: actions/checkout@v4
