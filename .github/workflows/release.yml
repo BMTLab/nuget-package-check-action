@@ -71,7 +71,7 @@ jobs:
 
       - name: Push changes to dev
         run: |
-          git push origin dev --force
+          git push origin dev --force-with-lease
 
       - name: Checkout main branch again
         uses: actions/checkout@v4
