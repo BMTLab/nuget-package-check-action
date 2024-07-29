@@ -45,7 +45,7 @@
     "@vitest/coverage-v8": "^2.0.2",
     "eslint": "^9.7.0",
     "globals": "^15.8.0",
-    "msw": "^2.3.1",
+    "msw": "^2.3.4",
     "vitest": "^2.0.1"
   },
   "publishConfig": {
