@@ -5,23 +5,83 @@ on:
     branches:
       - main
       - dev
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.github/dependabot.yml'
+      - 'LICENSE'
 
   push:
     branches:
       - main
       - dev
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.github/dependabot.yml'
+      - 'LICENSE'
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      skip_ci: ${{ steps.check.outputs.skip_ci }}
+      skip_build: ${{ steps.check.outputs.skip_build }}
+    steps:
+      - name: Check if we need to skip CI
+        id: check
+        run: |
+          commit_message="${{ github.event.head_commit.message }}"
+          
+          if [[ -z "$commit_message" ]]; then
+            echo "CI failed: Commit message is empty. CI will not proceed." >&2
+            exit 1  # Abort CI execution on an empty message
+          fi
+          
+          # Convert the message to lower case
+          commit_message=$(echo "$commit_message" | tr '[:upper:]' '[:lower:]') 
+
+          if [[ "$commit_message" == *"[skip ci]"* ]]; then
+            echo "Commit message contains [skip ci], skipping CI." >&2
+            echo "skip_ci=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_ci=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$commit_message" == *"[skip build]"* ]]; then
+            echo "Commit message contains [skip build], skipping build." >&2
+            echo "skip_build=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if [[ -z "$GITHUB_OUTPUT" ]]; then
+            echo "CI failed: GITHUB_OUTPUT is empty or not set." >&2
+            exit 2
+          fi
+        shell: bash
+
   code-test:
+    needs: pre-commit
+    # Executed if there is no [skip ci]
+    if: ${{ needs.pre-commit.outputs.skip_ci == 'false' }}
     uses: ./.github/workflows/ci-code-test.yml
     secrets: inherit
 
   create-bundle:
-    needs: code-test
+    needs: [pre-commit, code-test]
+    # Skip if there is a [skip ci] or [skip build]
+    if: ${{ needs.pre-commit.outputs.skip_ci == 'false' && needs.pre-commit.outputs.skip_build == 'false' }}
     uses: ./.github/workflows/ci-create-bundle.yml
     secrets: inherit
 
   action-test:
-    needs: create-bundle
+    needs: [pre-commit, create-bundle]
+    # Skip if there is a [skip ci] or [skip build]
+    if: ${{ needs.pre-commit.outputs.skip_ci == 'false' && needs.pre-commit.outputs.skip_build == 'false' }}
     uses: ./.github/workflows/ci-action-test.yml
     secrets: inherit
