@@ -30,7 +30,6 @@ jobs:
           key: ${{ runner.OS }}-build-${{ hashFiles('package.json', 'package-lock.json') }}
           restore-keys: |
             ${{ runner.OS }}-build-${{ hashFiles('package.json') }}-
-            ${{ runner.OS }}-build-
 
       - name: Restore dependencies
         run: npm ci
