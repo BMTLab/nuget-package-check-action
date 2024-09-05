@@ -37,7 +37,7 @@ jobs:
       ### Install dependencies, run lint and tests scripts with coverage.
 
       - name: Restore dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run lint
         run: npm run lint
