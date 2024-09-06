@@ -1,9 +1,9 @@
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/metadata-syntax-for-github-actions
 
-name: 'NuGet Package Availability Checker'
+name: NuGet Package Availability Checker
 description: >-
   GitHub Action automates NuGet package availability checks, ensuring packages exist and are indexed on nuget.org.
-author: 'BMTLab'
+author: BMTLab
 branding:
   icon: package
   color: blue
@@ -22,5 +22,5 @@ outputs:
   indexed:
     description: 'Whether the package is indexed on nuget.org (true or false)'
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: node20
+  main: dist/index.js
