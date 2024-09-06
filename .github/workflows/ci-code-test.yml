@@ -13,6 +13,9 @@ jobs:
     env:
       OS: ${{ matrix.os }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup Node.js, cache, and install dependencies
         timeout-minutes: 5
         uses: ./.github/actions/setup-node-project
@@ -38,6 +41,9 @@ jobs:
   security-checks:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup Node.js, cache, and install dependencies
         timeout-minutes: 5
         uses: ./.github/actions/setup-node-project
