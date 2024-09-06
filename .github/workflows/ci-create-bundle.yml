@@ -83,16 +83,6 @@ jobs:
           git push origin HEAD:${{ steps.determine_branch.outputs.branch_name }} --force
           echo 'Changes successfully pushed'
 
-      # Clearing GPG keys
-      - name: Cleanup GPG keys
-        if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
-        run: |
-          gpg_fingerprint=$(gpg --list-secret-keys --with-colons ${{ secrets.GPG_KEY_ID }} | grep fpr | head -n 1 | cut -d: -f10)
-          gpg --batch --yes --delete-secret-keys "gpg_fingerprint"
-          gpg --batch --yes --delete-keys "gpg_fingerprint"
-          echo 'GPG keys disposed'
-          #####
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

@@ -35497,7 +35497,7 @@ const currentDir = path__WEBPACK_IMPORTED_MODULE_3__.dirname(currentFile)
 
 // Check if this script is being run directly (not imported as a module), and if so, execute it.
 if (process.argv[1] === currentFile || process.argv[1] === `${currentDir}/index.js`) {
-  _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug('Running NuGet Package Index Checker Action...')
+  _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug('Running NuGet Package Index Checker Action..')
   await run()
 }
 
