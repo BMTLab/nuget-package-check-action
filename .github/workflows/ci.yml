@@ -56,7 +56,7 @@ jobs:
             commit_message=$(git log -1 --pretty=%B ${{ github.event.pull_request.head.sha }})
           fi
 
-          echo "$commit_message"
+          echo "Commit message: $commit_message"
 
           if [[ -z "$commit_message" ]]; then
             echo 'skip_ci=false' >> $GITHUB_OUTPUT
