@@ -80,6 +80,6 @@ const currentDir = path.dirname(currentFile)
 
 // Check if this script is being run directly (not imported as a module), and if so, execute it.
 if (process.argv[1] === currentFile || process.argv[1] === `${currentDir}/index.js`) {
-  core.debug('Running NuGet Package Index Checker Action...')
+  core.debug('Running NuGet Package Index Checker Action..')
   await run()
 }

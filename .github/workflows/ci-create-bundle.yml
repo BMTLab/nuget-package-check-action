@@ -8,8 +8,6 @@ jobs:
   bundle:
     runs-on: ubuntu-latest
     env:
-      BOT_NAME: ${{ vars.BOT_NAME }}
-      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
@@ -66,10 +64,10 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GIT_COMMITTER_NAME: ${{ github.actor }}
           GIT_COMMITTER_EMAIL: ${{ secrets.GIT_COMMITTER_EMAIL }}
-          GIT_AUTHOR_NAME: ${{ env.BOT_NAME }}
-          GIT_AUTHOR_EMAIL: ${{ env.BOT_EMAIL }}
+          GIT_AUTHOR_NAME: ${{ vars.BOT_NAME }}
+          GIT_AUTHOR_EMAIL: ${{ vars.BOT_EMAIL }}
         run: |
-          git commit -m "[${{ env.BOT_NAME }}] Update dist/index.js"
+          git commit -m "[${{ env.GIT_AUTHOR_NAME }}] Update dist/index.js"
           echo 'Changes committed'
 
       - name: Verify commit signature
@@ -89,8 +87,9 @@ jobs:
       - name: Cleanup GPG keys
         if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
         run: |
-          gpg --batch --delete-secret-keys ${{ secrets.GPG_KEY_ID }}
-          gpg --batch --delete-keys ${{ secrets.GPG_KEY_ID }}
+          gpg_fingerprint=$(gpg --list-secret-keys --with-colons ${{ secrets.GPG_KEY_ID }} | grep fpr | head -n 1 | cut -d: -f10)
+          gpg --batch --yes --delete-secret-keys "gpg_fingerprint"
+          gpg --batch --yes --delete-keys "gpg_fingerprint"
           echo 'GPG keys disposed'
           #####
 
