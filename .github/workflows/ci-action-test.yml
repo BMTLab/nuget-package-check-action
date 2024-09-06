@@ -38,7 +38,7 @@ jobs:
           package: '-Invalid..PackageName-'
           version: a.b.invalid_version
           attempts: -10
-        timeout-minutes: 2
+        timeout-minutes: 1
         continue-on-error: true
 
       - name: Log output for Incorrect package
@@ -70,7 +70,7 @@ jobs:
           package: ${{ env.NUGET_NON_EXIST_PACKAGE }}
           version: ${{ env.NUGET_NON_EXIST_PACKAGE_VERSION }}
           attempts: 3
-        timeout-minutes: 5
+        timeout-minutes: 2
         continue-on-error: true
 
       - name: Assert 'indexed' Output for Unavailable Package
