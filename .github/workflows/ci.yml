@@ -43,7 +43,6 @@ jobs:
           # This will ensure that all commits are loaded, not just the last one:
           fetch-depth: 0
 
-
       - name: Check if we need to skip CI
         id: check
         run: |
@@ -82,23 +81,22 @@ jobs:
           fi
           #####
 
+  # Executed if there is no [skip ci]
   code-test:
     needs: pre-commit
-    # Executed if there is no [skip ci]
     if: ${{ needs.pre-commit.outputs.skip_ci == 'false' }}
     uses: ./.github/workflows/ci-code-test.yml
     secrets: inherit
 
+  # Skip if there is a [skip ci] or [skip build]
   create-bundle:
     needs: [pre-commit, code-test]
-    # Skip if there is a [skip ci] or [skip build]
     if: ${{ needs.pre-commit.outputs.skip_ci == 'false' && needs.pre-commit.outputs.skip_build == 'false' }}
     uses: ./.github/workflows/ci-create-bundle.yml
     secrets: inherit
 
   action-test:
     needs: [pre-commit, create-bundle]
-    # Skip if there is a [skip ci] or [skip build]
     if: ${{ needs.pre-commit.outputs.skip_ci == 'false' && needs.pre-commit.outputs.skip_build == 'false' }}
     uses: ./.github/workflows/ci-action-test.yml
     secrets: inherit
