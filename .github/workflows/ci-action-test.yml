@@ -1,47 +1,36 @@
+# ./workflows/ci-action-test.yml
 name: Cross-Platform Action Test CI
 
 on:
   workflow_call:
 
-env:
-  NUGET_EXIST_PACKAGE: BMTLab.OneOf.Reduced
-  NUGET_EXIST_PACKAGE_VERSION: 4.1.424
-  NUGET_NON_EXIST_PACKAGE: NonExistingPackage.AGHEQDEHWAXE
-  NUGET_NON_EXIST_PACKAGE_VERSION: 1.0.0
-
 jobs:
+  generate-package-name:
+    runs-on: ubuntu-latest
+    outputs:
+      nuget_non_exist_package: ${{ steps.generate.outputs.nuget_non_exist_package }}
+    steps:
+      - name: Generate random non-existent package name
+        id: generate
+        run: |
+          random_string=$(openssl rand -hex 12)
+          echo "NonExistingPackage.${random_string}" >> $GITHUB_OUTPUT
+
   action-test:
-    # Run jobs on a matrix of operating systems to ensure cross-platform compatibility.
     runs-on: ${{ matrix.os }}
+    needs: generate-package-name
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-
+    env:
+      NUGET_EXIST_PACKAGE: ${{ vars.NUGET_EXIST_PACKAGE }}
+      NUGET_EXIST_PACKAGE_VERSION: ${{ vars.NUGET_EXIST_PACKAGE_VERSION }}
+      NUGET_NON_EXIST_PACKAGE: ${{ needs.generate-package-name.outputs.nuget_non_exist_package }}
+      NUGET_NON_EXIST_PACKAGE_VERSION: 1.0.0
     steps:
-      # Checkout the repository to access its content.
       - uses: actions/checkout@v4
 
-      # Step to use the GitHub Action built in this repo to check for an unavailable NuGet package.
-      - name: Check Unavailable NuGet package
-        id: check_unavailable
-        uses: ./
-        with:
-          package: ${{ env.NUGET_NON_EXIST_PACKAGE }}
-          version: ${{ env.NUGET_NON_EXIST_PACKAGE_VERSION }}
-          attempts: 3
-        continue-on-error: true
-
-      - name: Assert 'indexed' Output for Unavailable Package
-        run: |
-          if [ "${{ steps.check_unavailable.outputs.indexed }}" != 'false' ]; then
-            echo "Assertion failed: Expected 'false', got '${{ steps.check_unavailable.outputs.indexed }}'" >&2
-            exit 10
-          fi
-          echo 'Assertion passed for Unavailable package.'
-        shell: bash
-
-
-      # Step to check behavior with incorrect inputs for this Action.
+      ### Test to check behavior with incorrect inputs for this Action.
       - name: Check Incorrect NuGet package
         id: check_incorrect
         uses: ./
@@ -49,15 +38,53 @@ jobs:
           package: '-Invalid..PackageName-'
           version: a.b.invalid_version
           attempts: -10
+        timeout-minutes: 2
         continue-on-error: true
 
       - name: Log output for Incorrect package
         run: |
-          echo "For Incorrect package data got '${{ steps.check_incorrect.outputs.indexed }}'"
+          echo 'For Incorrect package data got:'
+          echo "- indexed=${{ steps.check_incorrect.outputs.indexed }}"
+          echo "- outcome=${{ steps.check_incorrect.outcome }}"
+          echo "- conclusion=${{ steps.check_incorrect.conclusion }}"
+          #####
+        shell: bash
+
+      ### Assert that the previous step failed (which is the expected behavior)
+      - name: Assert failure for Incorrect NuGet package
+        run: |
+          if [ "${{ steps.check_incorrect.outcome }}" != 'failure' ]; then
+            echo 'Assertion failed: validation error expected' >&2
+            exit 10
+          fi
+          echo 'Assertion passed for incorrect inputs'
+          #####
         shell: bash
 
 
-      # Step to check an available NuGet package.
+      ### Test to check for an unavailable NuGet package.
+      - name: Check Unavailable NuGet package
+        id: check_unavailable
+        uses: ./
+        with:
+          package: ${{ env.NUGET_NON_EXIST_PACKAGE }}
+          version: ${{ env.NUGET_NON_EXIST_PACKAGE_VERSION }}
+          attempts: 3
+        timeout-minutes: 5
+        continue-on-error: true
+
+      - name: Assert 'indexed' Output for Unavailable Package
+        run: |
+          if [ "${{ steps.check_unavailable.outputs.indexed }}" != 'false' ]; then
+            echo "Assertion failed: Expected 'false', got '${{ steps.check_unavailable.outputs.indexed }}'" >&2
+            exit 20
+          fi
+          echo 'Assertion passed for Unavailable package'
+          #####
+        shell: bash
+
+
+      ### Test to check an available NuGet package.
       - name: Check Available NuGet package
         id: check_available
         uses: ./
@@ -65,12 +92,15 @@ jobs:
           package: ${{ env.NUGET_EXIST_PACKAGE }}
           version: ${{ env.NUGET_EXIST_PACKAGE_VERSION }}
           attempts: 1
+        timeout-minutes: 2
+        continue-on-error: true
 
       - name: Assert 'indexed' output for Available package
         run: |
           if [ "${{ steps.check_available.outputs.indexed }}" != 'true' ]; then
             echo "Assertion failed: Expected 'true', got '${{ steps.check_available.outputs.indexed }}'" >&2
-            exit 20
+            exit 30
           fi
-          echo 'Assertion passed for Available package.'
+          echo 'Assertion passed for Available package'
+          #####
         shell: bash

@@ -1,3 +1,4 @@
+# ./workflows/ci-create-bundle.yml
 name: Bundle CI
 
 on:
@@ -6,41 +7,18 @@ on:
 jobs:
   bundle:
     runs-on: ubuntu-latest
-
     env:
       BOT_NAME: ${{ vars.BOT_NAME }}
       BOT_EMAIL: ${{ vars.BOT_EMAIL }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
-      # Checkout the repository to access its content.
-      - uses: actions/checkout@v4
+      - name: Setup Node.js, cache, and install dependencies
+        timeout-minutes: 5
+        uses: ./.github/actions/setup-node-project
 
-      # Setup Node.js environment on the runner to match the node version used in development.
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      # Cache node_modules based on hash of package.json and package-lock.json to speed up installations.
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-build-${{ hashFiles('package.json', 'package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-build-${{ hashFiles('package.json') }}-
-
-      - name: Restore dependencies
-        run: npm ci
-
+      # Install "compiler"
       - name: Install ncc
         run: npm i -g @vercel/ncc
-
-      - name: Print current branch
-        if: ${{ runner.debug == '1' }}
-        run: echo $GITHUB_REF
-
 
       ### Try to bundle & commit dist package.
 
@@ -52,12 +30,12 @@ jobs:
         run: |
           git add dist/index.js
           if git diff --staged --quiet; then
-            echo "changes_exist=false"
-            echo "changes_exist=false" >> $GITHUB_OUTPUT
+            echo 'No changes found in source files' >&2
+            echo 'changes_exist=false' >> $GITHUB_OUTPUT
           else
-            echo "changes_exist=true"
-            echo "changes_exist=true" >> $GITHUB_OUTPUT
+            echo 'changes_exist=true' >> $GITHUB_OUTPUT
           fi
+          #####
 
       - name: Determine branch name
         id: determine_branch
@@ -70,18 +48,16 @@ jobs:
             echo "branch_name=$(basename $GITHUB_REF)"
             echo "branch_name=$(basename $GITHUB_REF)" >> $GITHUB_OUTPUT
           fi
+          #####
 
       - name: Setup GPG for signing
         if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
         uses: ./.github/actions/git-gpg-setup
-        with:
-          name: ${{ env.BOT_NAME }}
-          email: ${{ env.BOT_EMAIL }}
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
 
-      - name: Commit updated version
+      - name: Commit changes
         if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -91,8 +67,29 @@ jobs:
           GIT_AUTHOR_EMAIL: ${{ env.BOT_EMAIL }}
         run: |
           git commit -m "[${{ env.BOT_NAME }}] Update dist/index.js"
-          git verify-commit $( git rev-parse HEAD )
+          echo 'Changes committed'
+
+      - name: Verify commit signature
+        if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
+        run: |
+          commit_hash=$(git rev-parse HEAD)
+          git verify-commit "$commit_hash"
+          echo 'Commit signature verified'
+
+      - name: Push changes
+        if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
+        run: |
           git push origin HEAD:${{ steps.determine_branch.outputs.branch_name }} --force
+          echo 'Changes successfully pushed'
+
+      # Clearing GPG keys
+      - name: Cleanup GPG keys
+        if: ${{ steps.check_changes.outputs.changes_exist == 'true' }}
+        run: |
+          gpg --batch --delete-secret-keys ${{ secrets.GPG_KEY_ID }}
+          gpg --batch --delete-keys ${{ secrets.GPG_KEY_ID }}
+          echo 'GPG keys disposed'
+          #####
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
