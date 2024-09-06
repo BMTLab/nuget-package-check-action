@@ -26,6 +26,11 @@ on:
       - '.github/dependabot.yml'
       - 'LICENSE'
 
+  workflow_dispatch:
+
+  schedule: # Weekly launch on Wednesdays at 19:00 UTC
+    - cron: '0 19 * * 3'
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
