@@ -37,11 +37,27 @@ jobs:
         if: ${{ runner.debug == '1' }}
         run: echo $GITHUB_REF
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # This will ensure that all commits are loaded, not just the last one:
+          fetch-depth: 0
+
+
       - name: Check if we need to skip CI
         id: check
         run: |
-          commit_message="${{ github.event.head_commit.message }}"
-          
+          commit_message=''
+
+          # Defining commit_message depending on the event
+          if [[ "${{ github.event_name }}" == 'push' ]]; then
+            commit_message="${{ github.event.head_commit.message }}"
+          elif [[ "${{ github.event_name }}" == 'pull_request' ]]; then
+            commit_message=$(git log -1 --pretty=%B ${{ github.event.pull_request.head.sha }})
+          fi
+
+          echo "$commit_message"
+
           if [[ -z "$commit_message" ]]; then
             echo 'skip_ci=false' >> $GITHUB_OUTPUT
             echo 'skip_build=false' >> $GITHUB_OUTPUT

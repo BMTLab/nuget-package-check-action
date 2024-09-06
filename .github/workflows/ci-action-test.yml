@@ -28,7 +28,8 @@ jobs:
       NUGET_NON_EXIST_PACKAGE: ${{ needs.generate-package-name.outputs.nuget_non_exist_package }}
       NUGET_NON_EXIST_PACKAGE_VERSION: 1.0.0
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       ### Test to check behavior with incorrect inputs for this Action.
       - name: Check Incorrect NuGet package
