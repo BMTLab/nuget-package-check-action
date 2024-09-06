@@ -32,12 +32,18 @@ jobs:
           key: ${{ runner.OS }}-build-${{ hashFiles('package.json', 'package-lock.json') }}
           restore-keys: |
             ${{ runner.OS }}-build-${{ hashFiles('package.json') }}-
-            ${{ runner.OS }}-build-
 
       ### Install dependencies, run lint and tests scripts with coverage.
 
       - name: Restore dependencies
-        run: npm ci
+        run: npm install
+
+      - name: Clean and reinstall dependencies if cache fails
+        if: failure()
+        run: |
+          npm cache clean --force
+          rm -rf node_modules
+          npm install
 
       - name: Run lint
         run: npm run lint
