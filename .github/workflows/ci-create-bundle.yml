@@ -19,7 +19,7 @@ jobs:
         timeout-minutes: 5
         uses: ./.github/actions/setup-node-project
 
-      # Install "compiler"
+      ### Install "compiler"
       - name: Install ncc
         run: npm i -g @vercel/ncc
 

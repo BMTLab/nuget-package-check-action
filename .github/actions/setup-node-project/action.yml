@@ -10,7 +10,6 @@ runs:
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
-      run: echo 'Dependencies reinstalled after cache failure'
       with:
         node-version-file: .nvmrc
 
