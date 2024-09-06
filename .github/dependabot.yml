@@ -1,13 +1,14 @@
+# dependabot.yml
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: npm
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: weekly
     commit-message:
-      prefix: "chore"
-      include: "scope"
-    target-branch: "dev"
+      prefix: chore
+      include: scope
+    target-branch: dev
     open-pull-requests-limit: 10
     reviewers:
       - BMTLab
@@ -17,14 +18,14 @@ updates:
     assignees:
       - BMTLab
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: weekly
     commit-message:
-      prefix: "chore"
-      include: "scope"
-    target-branch: "dev"
+      prefix: chore
+      include: scope
+    target-branch: dev
     open-pull-requests-limit: 10
     reviewers:
       - BMTLab
