@@ -37,34 +37,32 @@ jobs:
         if: ${{ runner.debug == '1' }}
         run: echo $GITHUB_REF
 
-      - name: Set default values for outputs
-        id: set_defaults
-        run: |
-          echo "skip_ci=false" >> $GITHUB_OUTPUT
-          echo "skip_build=false" >> $GITHUB_OUTPUT
-          #####
-
       - name: Check if we need to skip CI
         id: check
         run: |
           commit_message="${{ github.event.head_commit.message }}"
           
           if [[ -z "$commit_message" ]]; then
-            echo 'CI failed: Commit message is empty. CI will not proceed' >&2
-            exit 100 # Abort CI execution on an empty message
+            echo 'skip_ci=false' >> $GITHUB_OUTPUT
+            echo 'skip_build=false' >> $GITHUB_OUTPUT
+            exit 0
           fi
-          
+
           # Convert the message to lower case
           commit_message=$(echo "$commit_message" | tr '[:upper:]' '[:lower:]') 
 
           if [[ "$commit_message" == *"[skip ci]"* ]]; then
             echo 'Commit message contains [skip ci], skipping the whole CI' >&2
             echo 'skip_ci=true' >> $GITHUB_OUTPUT
+          else
+            echo 'skip_ci=false' >> $GITHUB_OUTPUT
           fi
 
           if [[ "$commit_message" == *"[skip build]"* ]]; then
             echo 'Commit message contains [skip build], skipping build' >&2
             echo 'skip_build=true' >> $GITHUB_OUTPUT
+          else
+            echo 'skip_build=false' >> $GITHUB_OUTPUT
           fi
           #####
 
