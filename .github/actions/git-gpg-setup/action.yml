@@ -28,6 +28,7 @@ runs:
         git config commit.gpgsign true
         git config user.signingkey $GPG_KEY_ID
         git config gpg.program /tmp/gpg.sh
+        gpg --list-secret-keys
         echo 'GPG setup complete'
         #####
       shell: bash

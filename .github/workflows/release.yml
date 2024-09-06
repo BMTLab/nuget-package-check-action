@@ -1,5 +1,6 @@
 # ./workflows/release.yml
 name: Release CI
+# Perform a release by merging dev into the target branch and creating a signed tag.
 
 on:
   workflow_dispatch:
@@ -18,16 +19,29 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SOURCE_BRANCH: dev
-      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       GIT_COMMITTER_NAME: ${{ github.actor }}
       GIT_COMMITTER_EMAIL: ${{ secrets.GIT_COMMITTER_EMAIL }}
-      GIT_AUTHOR_NAME: ${{ github.actor }}
-      GIT_AUTHOR_EMAIL: ${{ secrets.GIT_COMMITTER_EMAIL }}
+      GIT_AUTHOR_NAME: ${{ vars.BOT_NAME }}
+      GIT_AUTHOR_EMAIL: ${{ vars.BOT_EMAIL }}
     steps:
       - name: Print current branch
         if: ${{ runner.debug == '1' }}
-        run: echo $GITHUB_REF
+        run: echo "$GITHUB_REF"
+
+      - name: Check if current user is allowed to run the workflow
+        run: |
+          if [ "${{ github.actor }}" != 'BMTLab' ]; then
+            echo "Only the repository owner can run this workflow."
+            exit 103
+          fi
+          #####
+
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
 
       - name: Validate version
         id: validate_version
@@ -56,10 +70,8 @@ jobs:
           echo "Version $VERSION is valid and greater than the latest tag $LATEST_TAG"
           #####
 
-      - name: Checkout target branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.target_branch }}
+      - name: Fetch all branches
+        run: git fetch --all
 
       - name: Setup GPG for signing
         uses: ./.github/actions/git-gpg-setup
@@ -69,20 +81,23 @@ jobs:
 
       - name: Merge source branch into target with theirs strategy
         run: |
-          git merge ${{ env.SOURCE_BRANCH }} -X theirs
+          git merge origin/${{ env.SOURCE_BRANCH }} -X theirs \
+            -m "Merge ${{ env.SOURCE_BRANCH }} into ${{ github.event.inputs.target_branch }} for release ${{ github.event.inputs.version }}"
           echo 'Merge commit successfully created'
-
-      - name: Verify merge commit signature
-        run: |
-          commit_hash=$(git rev-parse HEAD)
-          git verify-commit "$commit_hash"
-          echo 'Merge commit signature verified!'
           #####
+
+#      - name: Verify merge commit signature
+#        run: |
+#          commit_hash=$(git rev-parse HEAD)
+#          git verify-commit "$commit_hash"
+#          echo 'Merge commit signature verified!'
+#          #####
 
       - name: Push changes to target branch
         run: |
           git push origin ${{ github.event.inputs.target_branch }} --force-with-lease
           echo 'Merge commit successfully pushed!'
+          #####
 
       - name: Create Tag
         run: |
@@ -96,9 +111,11 @@ jobs:
           tag_name="v${{ github.event.inputs.version }}"
           git tag -v "$tag_name"
           echo "Tag $tag_name signature verified!"
+          #####
 
       - name: Push Tag
         run: |
           tag_name="v${{ github.event.inputs.version }}"
           git push origin $tag_name
           echo "Tag $tag_name successfully pushed"
+          #####

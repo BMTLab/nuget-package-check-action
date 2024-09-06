@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: Print current branch
         if: ${{ runner.debug == '1' }}
-        run: echo $GITHUB_REF
+        run: echo "$GITHUB_REF"
 
       - name: Checkout repository
         uses: actions/checkout@v4
