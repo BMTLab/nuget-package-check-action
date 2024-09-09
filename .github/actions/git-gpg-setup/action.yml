@@ -1,16 +1,9 @@
+# ./actions/git-gpg-setup/action.yml
 name: Git and GPG Setup
-description: 'Set up GPG signed git bot'
-inputs:
-  name:
-    description: 'GitHub Action Bot name'
-    required: true
-  email:
-    description: 'GitHub bot email'
-    required: false
-    default: '41898282+github-actions[bot]@users.noreply.github.com'
-
+description: >-
+  Set up GPG signed git bot
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Import GPG key
       env:
@@ -25,6 +18,7 @@ runs:
         echo '#!/bin/bash' >> /tmp/gpg.sh
         echo 'gpg --batch --pinentry-mode=loopback --passphrase $GPG_PASSPHRASE $@' >> /tmp/gpg.sh
         chmod +x /tmp/gpg.sh
+        #####
       shell: bash
 
     - name: Setup git
@@ -34,5 +28,7 @@ runs:
         git config commit.gpgsign true
         git config user.signingkey $GPG_KEY_ID
         git config gpg.program /tmp/gpg.sh
+        gpg --list-secret-keys
+        echo 'GPG setup complete'
+        #####
       shell: bash
-
