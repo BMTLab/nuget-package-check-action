@@ -32,76 +32,16 @@ on:
     - cron: '0 19 * * 3'
 
 jobs:
-  pre-commit:
-    runs-on: ubuntu-latest
-    outputs:
-      skip_ci: ${{ steps.check.outputs.skip_ci }}
-      skip_build: ${{ steps.check.outputs.skip_build }}
-    steps:
-      - name: Print current branch
-        if: ${{ runner.debug == '1' }}
-        run: echo "$GITHUB_REF"
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # This will ensure that all commits are loaded, not just the last one:
-          fetch-depth: 0
-
-      - name: Check if we need to skip CI
-        id: check
-        run: |
-          commit_message=''
-
-          # Defining commit_message depending on the event
-          if [[ "${{ github.event_name }}" == 'push' ]]; then
-            commit_message="${{ github.event.head_commit.message }}"
-          elif [[ "${{ github.event_name }}" == 'pull_request' ]]; then
-            commit_message=$(git log -1 --pretty=%B ${{ github.event.pull_request.head.sha }})
-          fi
-
-          echo "Commit message: $commit_message"
-
-          if [[ -z "$commit_message" ]]; then
-            echo 'skip_ci=false' >> $GITHUB_OUTPUT
-            echo 'skip_build=false' >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          # Convert the message to lower case
-          commit_message=$(echo "$commit_message" | tr '[:upper:]' '[:lower:]') 
-
-          if [[ "$commit_message" == *"[skip ci]"* ]]; then
-            echo 'Commit message contains [skip ci], skipping the whole CI' >&2
-            echo 'skip_ci=true' >> $GITHUB_OUTPUT
-          else
-            echo 'skip_ci=false' >> $GITHUB_OUTPUT
-          fi
-
-          if [[ "$commit_message" == *"[skip build]"* ]]; then
-            echo 'Commit message contains [skip build], skipping build' >&2
-            echo 'skip_build=true' >> $GITHUB_OUTPUT
-          else
-            echo 'skip_build=false' >> $GITHUB_OUTPUT
-          fi
-          #####
-
-  # Executed if there is no [skip ci]
   code-test:
-    needs: pre-commit
-    if: ${{ needs.pre-commit.outputs.skip_ci == 'false' }}
     uses: ./.github/workflows/ci-code-test.yml
     secrets: inherit
 
-  # Skip if there is a [skip ci] or [skip build]
   create-bundle:
-    needs: [pre-commit, code-test]
-    if: ${{ needs.pre-commit.outputs.skip_ci == 'false' && needs.pre-commit.outputs.skip_build == 'false' }}
+    needs: code-test
     uses: ./.github/workflows/ci-create-bundle.yml
     secrets: inherit
 
   action-test:
-    needs: [pre-commit, create-bundle]
-    if: ${{ needs.pre-commit.outputs.skip_ci == 'false' && needs.pre-commit.outputs.skip_build == 'false' }}
+    needs: create-bundle
     uses: ./.github/workflows/ci-action-test.yml
     secrets: inherit
