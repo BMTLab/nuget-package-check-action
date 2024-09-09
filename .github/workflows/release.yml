@@ -102,7 +102,7 @@ jobs:
       - name: Create Tag
         run: |
           tag_name="v${{ github.event.inputs.version }}"
-          git tag -a $tag_name -m "Release $TAG_NAME" --sign --file tag.sig
+          git tag -a $tag_name -m "Release $tag_name" --sig
           echo "Tag $tag_name added"
           #####
 
