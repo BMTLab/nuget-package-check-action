@@ -13,12 +13,15 @@ on:
         description: Target branch for the release
         required: true
         default: main
+      source_branch:
+        description: Source branch on which the release is based
+        required: true
+        default: dev
 
 jobs:
   merge-and-release:
     runs-on: ubuntu-latest
     env:
-      SOURCE_BRANCH: dev
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       GIT_COMMITTER_NAME: ${{ github.actor }}
@@ -33,7 +36,7 @@ jobs:
       - name: Check if current user is allowed to run the workflow
         run: |
           if [ "${{ github.actor }}" != 'BMTLab' ]; then
-            echo "Only the repository owner can run this workflow."
+            echo 'Only the repository owner can run this workflow'
             exit 103
           fi
           #####
@@ -44,12 +47,11 @@ jobs:
           ref: ${{ github.event.inputs.target_branch }}
 
       - name: Validate version
-        id: validate_version
         run: |
-          VERSION=${{ github.event.inputs.version }}
+          version=${{ github.event.inputs.version }}
 
           # Check if the version matches the pattern X.Y.Z
-          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo 'Invalid version format. The version must match the pattern X.Y.Z, where X,Y & Z are digits' >&2
             exit 101
           fi
@@ -58,16 +60,16 @@ jobs:
           git fetch --tags
           
           # Get the latest tag
-          LATEST_TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)" || echo '1.0.0')
-          LATEST_TAG=${LATEST_TAG#v}
+          latest_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)" || echo '1.0.0')
+          latest_tag=${latest_tag#v}
 
           # Compare versions
-          if [[ $(echo -e "$LATEST_TAG\n$VERSION" | sort -Vr | head -n1) != "$VERSION" ]]; then
-            echo "The provided version $VERSION is not greater than the latest tag $LATEST_TAG" >&2
+          if [[ $(echo -e "${latest_tag}\n${version}" | sort -Vr | head -n1) != "$version" ]]; then
+            echo "The provided version $version is not greater than the latest tag $latest_tag" >&2
             exit 102
           fi
 
-          echo "Version $VERSION is valid and greater than the latest tag $LATEST_TAG"
+          echo "Version $version is valid and greater than the latest tag $latest_tag"
           #####
 
       - name: Fetch all branches
@@ -81,17 +83,10 @@ jobs:
 
       - name: Merge source branch into target with theirs strategy
         run: |
-          git merge origin/${{ env.SOURCE_BRANCH }} -X theirs \
-            -m "Merge ${{ env.SOURCE_BRANCH }} into ${{ github.event.inputs.target_branch }} for release ${{ github.event.inputs.version }}"
+          git merge origin/${{ github.event.inputs.source_branch }} -X theirs \
+            -m "Merge ${{ github.event.inputs.source_branch }} into ${{ github.event.inputs.target_branch }} for release ${{ github.event.inputs.version }}"
           echo 'Merge commit successfully created'
           #####
-
-#      - name: Verify merge commit signature
-#        run: |
-#          commit_hash=$(git rev-parse HEAD)
-#          git verify-commit "$commit_hash"
-#          echo 'Merge commit signature verified!'
-#          #####
 
       - name: Push changes to target branch
         run: |
@@ -102,7 +97,8 @@ jobs:
       - name: Create Tag
         run: |
           tag_name="v${{ github.event.inputs.version }}"
-          git tag -a $tag_name -m "Release $tag_name" --sig
+          latest_commit=$(git rev-parse HEAD)
+          git tag -a "$tag_name" -m "Release $tag_name" --sig "$latest_commit"
           echo "Tag $tag_name added"
           #####
 
@@ -116,6 +112,6 @@ jobs:
       - name: Push Tag
         run: |
           tag_name="v${{ github.event.inputs.version }}"
-          git push origin $tag_name
+          git push origin "$tag_name"
           echo "Tag $tag_name successfully pushed"
           #####
