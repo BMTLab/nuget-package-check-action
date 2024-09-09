@@ -1,99 +1,117 @@
-name: Release On Main Branch
+# ./workflows/release.yml
+name: Release CI
+# Perform a release by merging dev into the target branch and creating a signed tag.
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version for the release, without (v) prefix'
+        description: Version for the release, without (v) prefix
         required: true
-        default: '2.0.0'
+        default: 1.5.X
+      target_branch:
+        description: Target branch for the release
+        required: true
+        default: main
+      source_branch:
+        description: Source branch on which the release is based
+        required: true
+        default: dev
 
 jobs:
-  rebase-and-merge:
+  merge-and-release:
     runs-on: ubuntu-latest
-
     env:
-      BOT_NAME: ${{ vars.BOT_NAME }}
-      BOT_EMAIL: ${{ vars.BOT_EMAIL }}
-      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-      MAIN_BRANCH: tmp
-
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      GIT_COMMITTER_NAME: ${{ github.actor }}
+      GIT_COMMITTER_EMAIL: ${{ secrets.GIT_COMMITTER_EMAIL }}
+      GIT_AUTHOR_NAME: ${{ vars.BOT_NAME }}
+      GIT_AUTHOR_EMAIL: ${{ vars.BOT_EMAIL }}
     steps:
-      - name: Checkout dev branch
+      - name: Print current branch
+        if: ${{ runner.debug == '1' }}
+        run: echo "$GITHUB_REF"
+
+      - name: Check if current user is allowed to run the workflow
+        run: |
+          if [ "${{ github.actor }}" != 'BMTLab' ]; then
+            echo 'Only the repository owner can run this workflow'
+            exit 103
+          fi
+          #####
+
+      - name: Checkout target branch
         uses: actions/checkout@v4
         with:
-          ref: dev
-
-      - name: Setup GPG for signing
-        uses: ./.github/actions/git-gpg-setup
-        with:
-          name: ${{ env.BOT_NAME }}
-          email: ${{ env.BOT_EMAIL }}
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          ref: ${{ github.event.inputs.target_branch }}
 
       - name: Validate version
-        id: validate_version
         run: |
-          VERSION=${{ github.event.inputs.version }}
+          version=${{ github.event.inputs.version }}
 
           # Check if the version matches the pattern X.Y.Z
-          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Invalid version format. The version must match the pattern X.Y.Z" >&2
+          if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'Invalid version format. The version must match the pattern X.Y.Z, where X,Y & Z are digits' >&2
             exit 101
           fi
 
           # Fetch all tags
           git fetch --tags
-
+          
           # Get the latest tag
-          LATEST_TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)" || echo '0.0.0')
-          LATEST_TAG=${LATEST_TAG#v}
+          latest_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)" || echo '1.0.0')
+          latest_tag=${latest_tag#v}
 
           # Compare versions
-          if [[ $(echo -e "$LATEST_TAG\n$VERSION" | sort -Vr | head -n1) != "$VERSION" ]]; then
-            echo "The provided version $VERSION is not greater than the latest tag $LATEST_TAG" >&2
+          if [[ $(echo -e "${latest_tag}\n${version}" | sort -Vr | head -n1) != "$version" ]]; then
+            echo "The provided version $version is not greater than the latest tag $latest_tag" >&2
             exit 102
           fi
 
-          echo "Version $VERSION is valid and greater than the latest tag $LATEST_TAG"
+          echo "Version $version is valid and greater than the latest tag $latest_tag"
+          #####
 
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.MAIN_BRANCH }}
+      - name: Fetch all branches
+        run: git fetch --all
 
-      - name: Rebase dev on main
+      - name: Setup GPG for signing
+        uses: ./.github/actions/git-gpg-setup
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+
+      - name: Merge source branch into target with theirs strategy
         run: |
-          git checkout dev
-          git rebase ${{ env.MAIN_BRANCH }}
+          git merge origin/${{ github.event.inputs.source_branch }} -X theirs \
+            -m "Merge ${{ github.event.inputs.source_branch }} into ${{ github.event.inputs.target_branch }} for release ${{ github.event.inputs.version }}"
+          echo 'Merge commit successfully created'
+          #####
 
-      - name: Push changes to dev
+      - name: Push changes to target branch
         run: |
-          git push origin dev --force-with-lease
-
-      - name: Checkout main branch again
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.MAIN_BRANCH }}
-
-      - name: Merge dev into main with fast-forward
-        run: |
-          git merge --ff-only dev
-
-      - name: Push changes to main
-        run: |
-          git push origin ${{ env.MAIN_BRANCH }}
+          git push origin ${{ github.event.inputs.target_branch }} --force-with-lease
+          echo 'Merge commit successfully pushed!'
+          #####
 
       - name: Create Tag
-        env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GIT_COMMITTER_NAME: ${{ github.actor }}
-          GIT_COMMITTER_EMAIL: ${{ secrets.GIT_COMMITTER_EMAIL }}
-          GIT_AUTHOR_NAME: ${{ env.BOT_NAME }}
-          GIT_AUTHOR_EMAIL: ${{ env.BOT_EMAIL }}
         run: |
-          TAG_NAME="v${{ github.event.inputs.version }}"
-          git tag -a $TAG_NAME -m "Release $TAG_NAME" --sign --file tag.sig
-          git push origin $TAG_NAME
+          tag_name="v${{ github.event.inputs.version }}"
+          latest_commit=$(git rev-parse HEAD)
+          git tag -a "$tag_name" -m "Release $tag_name" --sig "$latest_commit"
+          echo "Tag $tag_name added"
+          #####
+
+      - name: Verify tag signature
+        run: |
+          tag_name="v${{ github.event.inputs.version }}"
+          git tag -v "$tag_name"
+          echo "Tag $tag_name signature verified!"
+          #####
+
+      - name: Push Tag
+        run: |
+          tag_name="v${{ github.event.inputs.version }}"
+          git push origin "$tag_name"
+          echo "Tag $tag_name successfully pushed"
+          #####
