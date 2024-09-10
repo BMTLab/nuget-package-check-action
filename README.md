@@ -1,5 +1,6 @@
 # nuget-package-check-action
 
+[![Release](https://img.shields.io/github/release/BMTLab/nuget-package-check-action.svg?label=latest%20release&color=0266d6)](https://github.com/BMTLab/nuget-package-check-action/releases/latest)
 [![CI](https://github.com/BMTLab/nuget-package-check-action/actions/workflows/ci.yml/badge.svg)](https://github.com/BMTLab/nuget-package-check-action/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/BMTLab/nuget-package-check-action/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/BMTLab/nuget-package-check-action/actions/workflows/github-code-scanning/codeql)
 [![codecov](https://codecov.io/gh/BMTLab/nuget-package-check-action/graph/badge.svg?token=YGYDJTTSQB)](https://codecov.io/gh/BMTLab/nuget-package-check-action)
