@@ -35374,7 +35374,7 @@ const defaultSleepBetweenAttempts = 30_000
  * @param {string} packageName - The name of the NuGet package to check.
  * @param {string} packageVersion - The version of the NuGet package to check.
  * @param {number} maxAttempts - The maximum number of times to check if the package is indexed.
- * @param {number} [timeout=30000] - The delay in milliseconds between check attempts. Defaults to 30000 milliseconds.
+ * @param {number} [timeout=30000] - The delay in milliseconds between check attempts.
  * @returns {Promise<boolean>} True if the package is eventually found to be indexed, otherwise false.
  */
 /* harmony default export */ async function src_core(packageName,
