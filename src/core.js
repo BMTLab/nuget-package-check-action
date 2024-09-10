@@ -1,15 +1,16 @@
 /**
  * Core module for checking NuGet package indexing status
  *
- * This module implements the core functionality to check if a specific NuGet package is indexed on nuget.org.
+ * This module implements the core functionality to check if a specific NuGet package is indexed
+ * on <a href="https://nuget.org">nuget.org</a>.
  * It performs a series of HTTP requests to determine if a package is available and logs each attempt.
  * If a package is not indexed initially, the module retries the check according to the specified number of attempts
  * and delay interval between each attempt.
  *
- * @file   This module defines the function to repeatedly check the indexing status of a NuGet package using
- *         the provided package name, version, and the maximum number of attempts. The function utilizes utility
- *         functions from './utils.js' to perform delays and check resource availability via HTTP requests.
- * @author Nikita (Neverov) BMTLab
+ * @file    This module defines the function to repeatedly check the indexing status of a NuGet package using
+ *          the provided package name, version, and the maximum number of attempts. The function utilizes utility
+ *          functions from `./utils.js` to perform delays and check resource availability via HTTP requests.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

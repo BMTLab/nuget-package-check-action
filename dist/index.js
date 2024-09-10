@@ -1,4 +1,4 @@
-import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
+import {createRequire as __WEBPACK_EXTERNAL_createRequire} from "module";
 /******/ var __webpack_modules__ = ({
 
 /***/ 8883:
@@ -35314,7 +35314,7 @@ axios.default = axios;
  * which can be used across different parts of the GitHub Action.
  *
  * @file   This file contains utility functions for the GitHub Action.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 
@@ -35425,7 +35425,7 @@ __nccwpck_require__.a(__webpack_module__, async (__webpack_handle_async_dependen
  *
  * @file   This is the main script for the NuGet Package Index Checker GitHub Action,
  *         including the action's primary logic and execution flow.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  * @copyright BMTLab, 2024
  */
@@ -35521,7 +35521,7 @@ __webpack_async_result__();
  * These functions ensure that the inputs to the GitHub Action meet expected patterns and conditions.
  *
  * @file   This file contains validation logic for the GitHub Action inputs.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

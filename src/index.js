@@ -2,13 +2,13 @@
  * Main entry point for the NuGet Package Index Checker Action.
  *
  * This module implements the core functionality of the GitHub Action,
- * orchestrating the checking of NuGet package availability on nuget.org.
+ * orchestrating the checking of NuGet package availability on <a href="https://nuget.org">nuget.org</a>.
  * It uses utility functions and validation checks to ensure proper execution
  * and provides detailed logging and error handling.
  *
- * @file   This is the main script for the NuGet Package Index Checker GitHub Action,
- *         including the action's primary logic and execution flow.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This is the main script for the NuGet Package Index Checker GitHub Action,
+ *          including the action's primary logic and execution flow.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  * @copyright BMTLab, 2024
  */

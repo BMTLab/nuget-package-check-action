@@ -7,9 +7,9 @@
  * The tests cover scenarios including valid and invalid input values, handling of HTTP request outcomes,
  * and proper logging of actions performed by the function.
  *
- * @file   This file defines tests for the `run` function using Vitest, focusing on the overall behavior
- *         and interaction with mocked dependencies.
- * @author Nikita (Neverov) BMTLab
+ * @file    This file defines tests for the `run` function using <a href="https://vitest.dev">Vitest</a>,
+ *          focusing on the overall behavior and interaction with mocked dependencies.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

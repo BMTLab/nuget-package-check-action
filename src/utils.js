@@ -4,8 +4,8 @@
  * Contains helper functions such as a resource resolver, and a sleep function to pause execution,
  * which can be used across different parts of the GitHub Action.
  *
- * @file   This file contains utility functions for the GitHub Action.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This file contains utility functions for the GitHub Action.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

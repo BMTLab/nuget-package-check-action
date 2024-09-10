@@ -3,10 +3,11 @@
  *
  * This file contains tests that verify the validation functions used in the NuGet Package Index Checker GitHub Action.
  * These tests ensure that the input validation for package names, package versions, and retry attempts
- * behave as expected under various conditions.
+ * to behave as expected under various conditions.
  *
- * @file   This file defines tests for validation functions using Vitest, focusing on input correctness and pattern matching.
- * @author Nikita (Neverov) BMTLab
+ * @file    This file defines tests for validation functions using <a href="https://vitest.dev">Vitest</a>,
+ *          focusing on input correctness and pattern matching.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 
