@@ -4,8 +4,8 @@
  * Provides functions to validate package names, package versions, and retry attempt inputs.
  * These functions ensure that the inputs to the GitHub Action meet expected patterns and conditions.
  *
- * @file   This file contains validation logic for the GitHub Action inputs.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This file contains validation logic for the GitHub Action inputs.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

@@ -1,13 +1,13 @@
 /**
  * Test suite for the NuGet Package Index Checker Action.
  *
- * This file contains tests that verify whether the checkNugetPackageIndexed function
+ * This file contains tests that verify whether the `checkNugetPackageIndexed` function
  * accurately determines the indexing status of NuGet packages on nuget.org. It uses
- * the MSW (Mock Service Worker) library to intercept and mock HTTP requests, simulating
+ * the <a href="https://mswjs.io">MSW (Mock Service Worker)</a> library to intercept and mock HTTP requests, simulating
  * different scenarios to ensure the functionality behaves as expected under various conditions.
  *
- * @file   This file defines tests for the checkNugetPackageIndexed function using Vitest.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This file defines tests for the `checkNugetPackageIndexed` function using <a href="https://vitest.dev">Vitest</a>.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

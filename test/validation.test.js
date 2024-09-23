@@ -3,10 +3,11 @@
  *
  * This file contains tests that verify the validation functions used in the NuGet Package Index Checker GitHub Action.
  * These tests ensure that the input validation for package names, package versions, and retry attempts
- * behave as expected under various conditions.
+ * to behave as expected under various conditions.
  *
- * @file   This file defines tests for validation functions using Vitest, focusing on input correctness and pattern matching.
- * @author Nikita (Neverov) BMTLab
+ * @file    This file defines tests for validation functions using <a href="https://vitest.dev">Vitest</a>,
+ *          focusing on input correctness and pattern matching.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 
@@ -22,8 +23,10 @@ describe('Input Validation Tests', () => {
   })
 
   it('validates non-empty strings with specific pattern', () => {
-    const pattern = /^[a-z]+$/ // Только строчные латинские буквы
+    const pattern = /^[a-z]+$/ // Lowercase Latin letters only
+
     expect(isValidInput('validinput', pattern)).toBe(true)
+
     expect(isValidInput('ValidInput', pattern)).toBe(false)
     expect(isValidInput('valid input', pattern)).toBe(false)
     expect(isValidInput('validinput123', pattern)).toBe(false)
@@ -35,6 +38,7 @@ describe('Input Validation Tests', () => {
     expect(isValidPackageName('NuGetPackage')).toBe(true)
     expect(isValidPackageName('10Package-F_dx64.dd.A')).toBe(true)
     expect(isValidPackageName('PackageName__')).toBe(true)
+
     expect(isValidPackageName('!InvalidPackageName')).toBe(false)
     expect(isValidPackageName('Invalid&PackageName')).toBe(false)
     expect(isValidPackageName('-InvalidPackageName')).toBe(false)
@@ -56,14 +60,19 @@ describe('Input Validation Tests', () => {
     expect(isValidPackageVersion('1.0.0-BETA')).toBe(true)
     expect(isValidPackageVersion('1.0.0.1')).toBe(true)
     expect(isValidPackageVersion('1.0.0.1-preview')).toBe(true)
+
     expect(isValidPackageVersion('1.0.0.1.5')).toBe(false)
     expect(isValidPackageVersion('v1.0.0')).toBe(false)
     expect(isValidPackageVersion('v-1.0.0')).toBe(false)
+    expect(isValidPackageVersion('1.a.0')).toBe(false)
+    expect(isValidPackageVersion('1.2.')).toBe(false)
+    expect(isValidPackageVersion('1..2')).toBe(false)
   })
 
   it('validates attempts input correctly', () => {
     expect(isValidMaxAttempts('3')).toBe(true)
     expect(isValidMaxAttempts('999')).toBe(true)
+
     expect(isValidMaxAttempts('-1')).toBe(false)
     expect(isValidMaxAttempts('abc')).toBe(false)
   })

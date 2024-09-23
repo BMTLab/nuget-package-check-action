@@ -35313,8 +35313,8 @@ axios.default = axios;
  * Contains helper functions such as a resource resolver, and a sleep function to pause execution,
  * which can be used across different parts of the GitHub Action.
  *
- * @file   This file contains utility functions for the GitHub Action.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This file contains utility functions for the GitHub Action.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 
@@ -35351,15 +35351,16 @@ async function isResourceExist (url) {
 /**
  * Core module for checking NuGet package indexing status
  *
- * This module implements the core functionality to check if a specific NuGet package is indexed on nuget.org.
+ * This module implements the core functionality to check if a specific NuGet package is indexed
+ * on <a href="https://nuget.org">nuget.org</a>.
  * It performs a series of HTTP requests to determine if a package is available and logs each attempt.
  * If a package is not indexed initially, the module retries the check according to the specified number of attempts
  * and delay interval between each attempt.
  *
- * @file   This module defines the function to repeatedly check the indexing status of a NuGet package using
- *         the provided package name, version, and the maximum number of attempts. The function utilizes utility
- *         functions from './utils.js' to perform delays and check resource availability via HTTP requests.
- * @author Nikita (Neverov) BMTLab
+ * @file    This module defines the function to repeatedly check the indexing status of a NuGet package using
+ *          the provided package name, version, and the maximum number of attempts. The function utilizes utility
+ *          functions from `./utils.js` to perform delays and check resource availability via HTTP requests.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 
@@ -35373,7 +35374,7 @@ const defaultSleepBetweenAttempts = 30_000
  * @param {string} packageName - The name of the NuGet package to check.
  * @param {string} packageVersion - The version of the NuGet package to check.
  * @param {number} maxAttempts - The maximum number of times to check if the package is indexed.
- * @param {number} [timeout=30000] - The delay in milliseconds between check attempts. Defaults to 30000 milliseconds.
+ * @param {number} [timeout=30000] - The delay in milliseconds between check attempts.
  * @returns {Promise<boolean>} True if the package is eventually found to be indexed, otherwise false.
  */
 /* harmony default export */ async function src_core(packageName,
@@ -35419,13 +35420,13 @@ __nccwpck_require__.a(__webpack_module__, async (__webpack_handle_async_dependen
  * Main entry point for the NuGet Package Index Checker Action.
  *
  * This module implements the core functionality of the GitHub Action,
- * orchestrating the checking of NuGet package availability on nuget.org.
+ * orchestrating the checking of NuGet package availability on <a href="https://nuget.org">nuget.org</a>.
  * It uses utility functions and validation checks to ensure proper execution
  * and provides detailed logging and error handling.
  *
- * @file   This is the main script for the NuGet Package Index Checker GitHub Action,
- *         including the action's primary logic and execution flow.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This is the main script for the NuGet Package Index Checker GitHub Action,
+ *          including the action's primary logic and execution flow.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  * @copyright BMTLab, 2024
  */
@@ -35520,8 +35521,8 @@ __webpack_async_result__();
  * Provides functions to validate package names, package versions, and retry attempt inputs.
  * These functions ensure that the inputs to the GitHub Action meet expected patterns and conditions.
  *
- * @file   This file contains validation logic for the GitHub Action inputs.
- * @author Nikita (BMTLab) Neverov (neverovnikita.bmt@gmail.com)
+ * @file    This file contains validation logic for the GitHub Action inputs.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 

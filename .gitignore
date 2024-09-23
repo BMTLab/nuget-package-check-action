@@ -11,8 +11,10 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
+# Reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+reports/
+eslint_report.json
 
 # Runtime data
 pids
@@ -30,27 +32,12 @@ coverage
 # nyc test coverage
 .nyc_output
 
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Bower dependency directory (https://bower.io/)
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
 # Dependency directories
 node_modules/
 jspm_packages/
 
 # IDE folders
 .idea/
-
-# Snowpack dependency directory (https://snowpack.dev/)
-web_modules/
-
-# TypeScript cache
-*.tsbuildinfo
 
 # Optional npm cache directory
 .npm
@@ -88,32 +75,7 @@ out
 # Generate output
 dist/*
 !/dist/index.js
-
-
-# Gatsby files
 .cache/
-# Comment in the public line in if your project uses Gatsby and not Next.js
-# https://nextjs.org/blog/next-9-1#public-directory-support
-# public
-
-
-# vuepress v2.x temp and cache directory
-.temp
-
-# Docusaurus cache and generated files
-.docusaurus
-
-# Serverless directories
-.serverless/
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
@@ -126,4 +88,3 @@ dist/*
 .pnp.*
 
 lib/
-eslint_report.json

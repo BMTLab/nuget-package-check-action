@@ -6,8 +6,9 @@
  * `isResourceExist` tests verify HTTP requests handling by simulating responses for existing and non-existing resources,
  * as well as handling different types of network errors.
  *
- * @file   This file defines tests for the utility functions using Vitest, focusing on accurate timing and HTTP behavior simulation.
- * @author Nikita (Neverov) BMTLab
+ * @file    This file defines tests for the utility functions using <a href="https://vitest.dev">Vitest</a>,
+ *          focusing on accurate timing and HTTP behavior simulation.
+ * @author  BMTLab (Nikita Neverov, neverovnikita.bmt@gmail.com)
  * @license MIT
  */
 
