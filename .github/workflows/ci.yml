@@ -28,9 +28,6 @@ on:
 
   workflow_dispatch:
 
-  schedule: # Weekly launch on Wednesdays at 19:00 UTC
-    - cron: '0 19 * * 3'
-
 jobs:
   code-test:
     uses: ./.github/workflows/ci-code-test.yml
