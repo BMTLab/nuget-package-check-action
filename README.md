@@ -15,7 +15,7 @@
 
 ```yaml
 - name: Check Available NuGet Package
-  uses: BMTLab/nuget-package-check-action@v1.5.2
+  uses: BMTLab/nuget-package-check-action@v1.5.3
   with:
     package: Your.AwesomePackage
     version: 1.3.505
@@ -31,7 +31,7 @@ so 10 retries are usually enough time between publishing and when the package is
 ```yaml
 - name: Check Available NuGet Package
   id: check-nuget-package
-  uses: BMTLab/nuget-package-check-action@v1.5.2
+  uses: BMTLab/nuget-package-check-action@v1.5.3
   with:
     package: Your.AwesomePackage # 👈🏻 Any valid NuGet Package name, case-insensitive
     version: 1.3.505.01-beta     # 👈🏻 Version without any prefix ('v' e.g), case-insensitive
@@ -63,7 +63,7 @@ The action sets an output variable called `indexed`, which can be used in the fo
 #### Action output log
 
 ```text
-⮞ Run BMTLab/nuget-package-check-action@v1.5.2
+⮞ Run BMTLab/nuget-package-check-action@v1.5.3
 Starting NuGet Package Index Checker...
 Package Name: BMTLab.OneOf.Reduced
 Package Version: 4.1.0424
