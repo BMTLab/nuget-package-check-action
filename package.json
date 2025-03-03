@@ -46,7 +46,7 @@
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@stryker-mutator/core": "^8.7.1",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^3.0.7",
     "eslint": "^9.18.0",
     "globals": "^15.14.0",
     "msw": "^2.7.0",
